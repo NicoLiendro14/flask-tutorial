@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import(
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
@@ -44,7 +43,7 @@ def create():
             )
             db.commit()
             return redirect(url_for('blog.index'))
-        return render_template('blog/create.html')
+    return render_template('blog/create.html')
 
 
 def get_post(id, check_author=True):
@@ -86,4 +85,14 @@ def update(id):
             (title, body, id)
         )
         db.commit()
-        return render_template('blog/update.html', post=post)
+    return render_template('blog/update.html', post=post)
+
+
+@bp.route('/<int:id>/delete', methods=('POST',))
+@login_required
+def delete(id):
+    get_post(id)
+    db = get_db()
+    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    db.commit()
+    return redirect(url_for('blog.index'))
